@@ -24,5 +24,5 @@ https://github.com/shacharKZ/MobiLapseBySMS/blob/main/db_handler.py
 # Try it yourself
 in order to run the simple demo (application with only local files) just install the requirements (requirements.txt) and run data_entry.py
 
-# connect to your FIRE BASE
+# Connect to your firebase
 in order to use firebase you will need to add your own firebase data. go to fire_base.py and fill your details next to the TODO we left in the code
