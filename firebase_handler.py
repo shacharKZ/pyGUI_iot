@@ -45,7 +45,6 @@ def get_data_from_fire_base_path(path="",):
 
 def add_data_to_fire_base_with_path(data, path="/"):
     ref = db.reference(path)
-    # ref.push({'hello': {'hi': 3, 'holla': 4}})
     ref.push(data)
 
 
@@ -60,7 +59,7 @@ def update_csv_as_json_to_fire_base(df: pd.DataFrame, path="/"):
     ref.set(json_tmp)
 
 
-'''This is not the best way to do that! find a better way for your code'''  # TODO !
+'''This is not the best way to do that! find a better way for your code'''
 def get_csv_from_json_from_fire_base(path="/"):
     try:
         ref = db.reference(path)
@@ -72,6 +71,7 @@ def get_csv_from_json_from_fire_base(path="/"):
     return df
 
 
+'''the following code might help you understand how to use those function or to debug your code'''
 def main():
     set_up_fire_base()
     # reset_db_with_dummy_data()

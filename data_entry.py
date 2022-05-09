@@ -6,11 +6,11 @@ import time
 # Add some color to the window
 sg.theme('DarkTeal9')
 
-EXCEL_FILE = 'Data_Entry.xlsx'
-FIRE_BASE_FILE = '/csv_file1'
-FIRE_BASE_FILE_TMP_LOCAL = './csv_file1_tmp.xlsx'
-df = pd.read_excel(EXCEL_FILE)
-firebase_handler.set_up_fire_base()
+FIRE_BASE_FILE = '/csv_file1'  # path inside firebase for the online xlsx (excel) file
+FIRE_BASE_FILE_TMP_LOCAL = './csv_file1_tmp.xlsx'  # path for local copy for data from firebase
+EXCEL_FILE = './Data_Entry.xlsx'  # local file
+df = pd.read_excel(EXCEL_FILE)  # local file
+firebase_handler.set_up_fire_base()  # might not work if firebase is not configure
 
 default_size = (20, 1)
 layout_home = [
@@ -31,10 +31,11 @@ layout_firebase = [
     [sg.Text('This will work only if pre-configured', visible=True)],
     [sg.Button('Open file from fire base!')],
     [sg.Button('Update file to fire base', visible=False)],
+    [sg.Exit()]
 ]
 
 layout = [
-    [sg.TabGroup([[sg.Tab('Home', layout_home, visible=True),
+    [sg.TabGroup([[sg.Tab('Home(local)', layout_home, visible=True),
                    sg.Tab('FireBase', layout_firebase, visible=True)
                    ]])],
     ]
@@ -54,7 +55,7 @@ while True:
         break
     if event == 'Clear':
         clear_input()
-    if event == 'Open file and edit by yourself':
+    if event == 'Open local file and edit it manually':
         os.system(f'open {EXCEL_FILE}')
     if event == 'Submit':
         new_record = pd.DataFrame(values, index=[0])
@@ -73,8 +74,9 @@ while True:
         window['Update file to fire base'].update(visible=True)
     if event == 'Update file to fire base':
         df = pd.read_excel(FIRE_BASE_FILE_TMP_LOCAL)
-        print(df)
+        # print(df)
         firebase_handler.update_csv_as_json_to_fire_base(df, FIRE_BASE_FILE)
+        sg.popup('Data was update to firebase!')
 
 
 window.close()
