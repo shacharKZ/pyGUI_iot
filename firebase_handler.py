@@ -1,90 +1,85 @@
-# import firebase_admin
-# from firebase_admin import credentials
-# from firebase_admin import db
-#
-# cred = credentials.Certificate("firebase_key.json")
-# firebase_admin.initialize_app(cred, {'databaseURL': 'https://demo1-ec9a9.firebaseio.com'})
-#
-# ref = db.reference('/students')
-# try:
-#     print(ref.get())
-# except():
-#     print("!!!! did not work1")
-# collection_ref = ref.child('students')
-# try:
-#     print(collection_ref.get())
-# except():
-#     print("!!!! did not work2")
-
-
-#
-# import os
-# import firebase_admin
-# from firebase_admin import db
-#
-#
-# API_REQUEST_DATETIME_FORMAT = '%d-%m-%YT%H-%M-%S'
-# STORAGE_BUCKET = 'demo1-ec9a9.appspot.com'
-# # os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = f'{os.sep}home{os.sep}demo1-ec9a9-firebase-adminsdk.json'
-# # os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'C:\\Users\\1912m\\mobilapse-firebase-key.json'
-#
-# # ROOT_CAPTURES_FOLDER_PATH = f'{os.sep}home{os.sep}pi{os.sep}cap_images{os.sep}'
-#
-# FIREBASE_RT_DB_URL = 'https://demo1-ec9a9-default-rtdb.europe-west1.firebasedatabase.app/'
-#
-# print('initializing FIREBASE')
-# default_app = firebase_admin.initialize_app(credential=None, options={'storageBucket': STORAGE_BUCKET,
-#                                                                       'databaseURL': FIREBASE_RT_DB_URL})
-# print('FIREBASE ready!')
-#
-#
-# ref = db.reference('/students')
-# print(ref.get())
-# # CAMERA_PATH = f'{os.sep}dev{os.sep}v4l{os.sep}by-id{os.sep}usb-USB2.0_UVC_VGA_USB2.0_UVC_VGA-video-index'
-#
-# DB_UPDATES = True
-
-
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
+import pandas as pd
+import json
 
-# Fetch the service account key JSON file contents
-cred = credentials.Certificate('firebase_key.json')
-# Initialize the app with a service account, granting admin privileges
-firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://demo1-ec9a9-default-rtdb.europe-west1.firebasedatabase.app/'
-})
+def set_up_fire_base():
+    # Fetch the service account key JSON file contents
+    cred = credentials.Certificate('firebase_key.json')
+    # Initialize the app with a service account, granting admin privileges
+    firebase_admin.initialize_app(cred, {
+        'databaseURL': 'https://demo1-ec9a9-default-rtdb.europe-west1.firebasedatabase.app/'
+    })
 
-ref = db.reference('/')
-ref.set({
-        'boxes':
+def reset_db_with_dummy_data():
+    ref = db.reference('/')
+    ref.set({
+        'students':
             {
-                'box001': {
-                    'color': 'red',
-                    'width': 1,
-                    'height': 3,
-                    'length': 2
+                'student_key_1': {
+                    'name': 'Alice',
+                    'semester': 2,
+                    'age': 22,
                 },
-                'box002': {
-                    'color': 'green',
-                    'width': 1,
-                    'height': 2,
-                    'length': 3
+                'student_key_2': {
+                    'name': 'Bob',
+                    'semester': 1,
+                    'age': 23,
                 },
-                'box003': {
-                    'color': 'yellow',
-                    'width': 3,
-                    'height': 2,
-                    'length': 1
-                }
+                'student_key_3': {
+                    'name': 'Mike',
+                    'semester': 3,
+                    'age': 21,
+                },
             }
-        })
-
-ref.push({'hello': {'hi': 3, 'holla': 4}})
+    })
 
 
-ref2 = db.reference('boxes')
+def get_data_from_fire_base_path(path="",):
+    ref = db.reference(path)
+    return ref.get()
 
-print(ref2.get('/'))
+
+def add_data_to_fire_base_with_path(data, path="/"):
+    ref = db.reference(path)
+    # ref.push({'hello': {'hi': 3, 'holla': 4}})
+    ref.push(data)
+
+
+def upload_csv_as_json_to_fire_base(df: pd.DataFrame, path="/"):
+    ref = db.reference(path)
+    json_tmp = df.to_json()
+    ref.push(json_tmp)
+
+def update_csv_as_json_to_fire_base(df: pd.DataFrame, path="/"):
+    ref = db.reference(path)
+    json_tmp = df.to_json()
+    ref.set(json_tmp)
+
+'''This is a bad way to do so! find a better way!'''  # TODO !
+def get_csv_from_json_from_fire_base(path="/"):
+    ref = db.reference(path)
+    dict_json_tmp = ref.get()
+    # single_key = [x for x in dict_json_tmp][0]
+    # json_tmp = json.loads(dict_json_tmp[single_key].__str__())
+    json_tmp = json.loads(dict_json_tmp.__str__())
+    df = pd.DataFrame(json_tmp)
+    return df
+
+
+set_up_fire_base()
+# reset_db_with_dummy_data()
+# add_data_to_fire_base_with_path({'hello': {'hi': 3, 'holla': 4}})
+# print(get_data_from_fire_base_path("students"))
+
+# df = pd.read_excel('./Data_Entry.xlsx')
+# print(df)
+# update_csv_as_json_to_fire_base(df, path='/csv_file1')
+tmp = get_csv_from_json_from_fire_base(path='/csv_file1')
+print(tmp)
+# # tmp['Name'][1] = "AAAAAAAAA"
+# tmp.loc[:, ('Name', 1)] = 'AAAAAA'
+# print(tmp)
+# update_csv_as_json_to_fire_base(tmp, path='/csv_file1')
 
