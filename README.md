@@ -11,7 +11,7 @@ https://www.youtube.com/watch?v=svcv8uub0D0
 (watch until the end for how to convert the py code into a stand alone application exe. note that this technique isn't prefect and you better check it before with your instructors)
 
 
-firbase:
+firebase:
 
 https://www.youtube.com/watch?v=yylnC3dr_no
 
