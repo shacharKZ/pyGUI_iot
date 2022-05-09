@@ -71,8 +71,8 @@ while True:
         df.to_excel(FIRE_BASE_FILE_TMP_LOCAL, index=False)
         time.sleep(0.07)
         os.system(f'open {FIRE_BASE_FILE_TMP_LOCAL}')
-        window['Update file to fire base'].update(visible=True)
-    if event == 'Update file to fire base':
+        window['Update file to firebase'].update(visible=True)
+    if event == 'Update file to firebase':
         df = pd.read_excel(FIRE_BASE_FILE_TMP_LOCAL)
         # print(df)
         firebase_handler.update_csv_as_json_to_fire_base(df, FIRE_BASE_FILE)
