@@ -1,6 +1,6 @@
 import PySimpleGUI as sg
 import pandas as pd
-
+import os
 # Add some color to the window
 sg.theme('DarkTeal9')
 
@@ -9,6 +9,7 @@ df = pd.read_excel(EXCEL_FILE)
 
 default_size = (20,1)
 layout_home = [
+    [sg.Button('Open file and edit by yourself')],
     [sg.Text('Please fill out the following fields:')],
     [sg.Text('Name', size=default_size), sg.InputText(key='Name')],
     [sg.Text('City', size=default_size), sg.InputText(key='City')],
@@ -33,7 +34,7 @@ layout = [
     ]
     # [sg.Button('Run'), sg.Button("Cancel")]]
 
-window = sg.Window('Simple data entry form', layout, size=(500, 260), font=('Arial', 15))
+window = sg.Window('Simple data entry form', layout, size=(500, 280), font=('Arial', 15))
 
 def clear_input():
     for key in values:
@@ -47,12 +48,15 @@ while True:
         break
     if event == 'Clear':
         clear_input()
+    if event == 'Open file and edit by yourself':
+        os.system(f'open {EXCEL_FILE}')
     if event == 'Submit':
         new_record = pd.DataFrame(values, index=[0])
         df = pd.concat([df, new_record], ignore_index=True)
         df.to_excel(EXCEL_FILE, index=False)
         sg.popup('Data saved!')
         clear_input()
+
 
 
 window.close()
