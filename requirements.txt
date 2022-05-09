@@ -1,0 +1,4 @@
+openpyxl
+pandas
+PySimpleGUI
+firebase_admin

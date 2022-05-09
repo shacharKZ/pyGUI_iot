@@ -1,15 +1,20 @@
 import PySimpleGUI as sg
 import pandas as pd
 import os
+import firebase_handler
+import time
 # Add some color to the window
 sg.theme('DarkTeal9')
 
 EXCEL_FILE = 'Data_Entry.xlsx'
+FIRE_BASE_FILE = '/csv_file1'
+FIRE_BASE_FILE_TMP_LOCAL = './csv_file1_tmp.xlsx'
 df = pd.read_excel(EXCEL_FILE)
+firebase_handler.set_up_fire_base()
 
-default_size = (20,1)
+default_size = (20, 1)
 layout_home = [
-    [sg.Button('Open file and edit by yourself')],
+    [sg.Button('Open local file and edit it manually')],
     [sg.Text('Please fill out the following fields:')],
     [sg.Text('Name', size=default_size), sg.InputText(key='Name')],
     [sg.Text('City', size=default_size), sg.InputText(key='City')],
@@ -23,8 +28,9 @@ layout_home = [
 ]
 
 layout_firebase = [
-    # [sg.Text('This will work only if you connected firebase right!')],
-    [sg.Text('Not yet implemented')],
+    [sg.Text('This will work only if pre-configured', visible=True)],
+    [sg.Button('Open file from fire base!')],
+    [sg.Button('Update file to fire base', visible=False)],
 ]
 
 layout = [
@@ -32,9 +38,9 @@ layout = [
                    sg.Tab('FireBase', layout_firebase, visible=True)
                    ]])],
     ]
-    # [sg.Button('Run'), sg.Button("Cancel")]]
 
 window = sg.Window('Simple data entry form', layout, size=(500, 280), font=('Arial', 15))
+
 
 def clear_input():
     for key in values:
@@ -56,7 +62,19 @@ while True:
         df.to_excel(EXCEL_FILE, index=False)
         sg.popup('Data saved!')
         clear_input()
-
+    if event == 'Open file from fire base!':
+        df = firebase_handler.get_csv_from_json_from_fire_base(FIRE_BASE_FILE)
+        if df is None:
+            sg.popup('Something did not work! check firebase_handler.py and firebase_key.json')
+            continue
+        df.to_excel(FIRE_BASE_FILE_TMP_LOCAL, index=False)
+        time.sleep(0.07)
+        os.system(f'open {FIRE_BASE_FILE_TMP_LOCAL}')
+        window['Update file to fire base'].update(visible=True)
+    if event == 'Update file to fire base':
+        df = pd.read_excel(FIRE_BASE_FILE_TMP_LOCAL)
+        print(df)
+        firebase_handler.update_csv_as_json_to_fire_base(df, FIRE_BASE_FILE)
 
 
 window.close()

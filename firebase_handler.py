@@ -4,13 +4,15 @@ from firebase_admin import db
 import pandas as pd
 import json
 
+
 def set_up_fire_base():
     # Fetch the service account key JSON file contents
-    cred = credentials.Certificate('firebase_key.json')
+    cred = credentials.Certificate('firebase_key.json')  # TODO <--- configure your firebase keys
     # Initialize the app with a service account, granting admin privileges
     firebase_admin.initialize_app(cred, {
-        'databaseURL': 'https://demo1-ec9a9-default-rtdb.europe-west1.firebasedatabase.app/'
+        'databaseURL': 'https://demo1-ec9a9-default-rtdb.europe-west1.firebasedatabase.app/'  # TODO <--- change too your firebase URL
     })
+
 
 def reset_db_with_dummy_data():
     ref = db.reference('/')
@@ -57,29 +59,33 @@ def update_csv_as_json_to_fire_base(df: pd.DataFrame, path="/"):
     json_tmp = df.to_json()
     ref.set(json_tmp)
 
-'''This is a bad way to do so! find a better way!'''  # TODO !
+
+'''This is not the best way to do that! find a better way for your code'''  # TODO !
 def get_csv_from_json_from_fire_base(path="/"):
-    ref = db.reference(path)
-    dict_json_tmp = ref.get()
-    # single_key = [x for x in dict_json_tmp][0]
-    # json_tmp = json.loads(dict_json_tmp[single_key].__str__())
+    try:
+        ref = db.reference(path)
+        dict_json_tmp = ref.get()
+    except:
+        return None
     json_tmp = json.loads(dict_json_tmp.__str__())
     df = pd.DataFrame(json_tmp)
     return df
 
 
-set_up_fire_base()
-# reset_db_with_dummy_data()
-# add_data_to_fire_base_with_path({'hello': {'hi': 3, 'holla': 4}})
-# print(get_data_from_fire_base_path("students"))
+def main():
+    set_up_fire_base()
+    # reset_db_with_dummy_data()
+    # add_data_to_fire_base_with_path({'numbers': {'num1': 3, 'num2': 4}})
+    # print(get_data_from_fire_base_path("students"))
 
-# df = pd.read_excel('./Data_Entry.xlsx')
-# print(df)
-# update_csv_as_json_to_fire_base(df, path='/csv_file1')
-tmp = get_csv_from_json_from_fire_base(path='/csv_file1')
-print(tmp)
-# # tmp['Name'][1] = "AAAAAAAAA"
-# tmp.loc[:, ('Name', 1)] = 'AAAAAA'
-# print(tmp)
-# update_csv_as_json_to_fire_base(tmp, path='/csv_file1')
+    # df = pd.read_excel('./Data_Entry.xlsx')
+    # print(df)
+    # update_csv_as_json_to_fire_base(df, path='/csv_file1')
+    tmp = get_csv_from_json_from_fire_base(path='/csv_file1')
+    print(tmp)
+    # print(tmp)
+    # update_csv_as_json_to_fire_base(tmp, path='/csv_file1')
 
+
+if __name__ == '__main__':
+    main()
